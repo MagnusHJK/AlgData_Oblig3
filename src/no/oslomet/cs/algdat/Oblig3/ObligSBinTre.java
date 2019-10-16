@@ -60,8 +60,8 @@ public class ObligSBinTre<T> implements Beholder<T>
 
     // p er nå null, dvs. ute av treet, q er den siste vi passerte
 
-    //TODO: fiks så foreldre, venstre og høyre er riktig
-    p = new Node<>(verdi,null,null,null);                   // oppretter en ny node
+    //Siden q er forrige node blir dette foreldren til p
+    p = new Node<>(verdi,null,null,q);                   // oppretter en ny node
 
     if (q == null) rot = p;                  // p blir rotnode
     else if (cmp < 0) q.venstre = p;         // venstre barn til q
@@ -200,5 +200,13 @@ public class ObligSBinTre<T> implements Beholder<T>
     }
 
   } // BladnodeIterator
+
+  public static void main(String[] args){
+      Integer[] a = {4,7,2,9,5,10,8,1,3,6};
+      ObligSBinTre<Integer> tre = new ObligSBinTre<>(Comparator.naturalOrder());
+      for(int verdi : a) tre.leggInn(verdi);
+    System.out.println(tre.antall());
+  }
+
 
 } // ObligSBinTre
