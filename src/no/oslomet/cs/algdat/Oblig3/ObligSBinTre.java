@@ -42,7 +42,8 @@ public class ObligSBinTre<T> implements Beholder<T>
     antall = 0;
     comp = c;
   }
-  
+
+  //Oppgave 1
   @Override
   public boolean leggInn(T verdi)
   {
@@ -105,10 +106,35 @@ public class ObligSBinTre<T> implements Beholder<T>
   {
     return antall;
   }
-  
-  public int antall(T verdi)
-  {
-    throw new UnsupportedOperationException("Ikke kodet ennå!");
+
+  //Oppgave 2
+  public int antall(T verdi) {
+    int forekomster = 0;
+    Node<T> p = rot;
+
+    if(verdi == null){
+      return forekomster;
+    }
+
+    while(p != null){
+      int compare = comp.compare(verdi, p.verdi);
+
+      //Er verdien lavere og dermed på venstre side?
+      if(compare < 0){
+        p = p.venstre;
+      }
+      //Er verdien høyere og dermed på høyre side?
+      else if(compare > 0){
+        p = p.høyre;
+      }
+      //Funnet verdien, øker teller og lar søket fortsette på høyre side,
+      //siden alle like tall må ligge på høyre side.
+      else{
+        forekomster++;
+        p = p.høyre;
+      }
+    }
+    return forekomster;
   }
   
   @Override
@@ -202,10 +228,10 @@ public class ObligSBinTre<T> implements Beholder<T>
   } // BladnodeIterator
 
   public static void main(String[] args){
-      Integer[] a = {4,7,2,9,5,10,8,1,3,6};
+      Integer[] a = {4,7,2,9,4,10,8,7,4,6};
       ObligSBinTre<Integer> tre = new ObligSBinTre<>(Comparator.naturalOrder());
       for(int verdi : a) tre.leggInn(verdi);
-    System.out.println(tre.antall());
+      System.out.println(tre.antall(4));
   }
 
 
