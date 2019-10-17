@@ -62,7 +62,7 @@ public class ObligSBinTre<T> implements Beholder<T>
     // p er nå null, dvs. ute av treet, q er den siste vi passerte
 
     //Siden q er forrige node blir dette foreldren til p
-    p = new Node<>(verdi,null,null,q);                   // oppretter en ny node
+    p = new Node<>(verdi,null,null, q);                  // oppretter en ny node
 
     if (q == null) rot = p;                  // p blir rotnode
     else if (cmp < 0) q.venstre = p;         // venstre barn til q
@@ -148,37 +148,48 @@ public class ObligSBinTre<T> implements Beholder<T>
   {
     throw new UnsupportedOperationException("Ikke kodet ennå!");
   }
-  
-  private static <T> Node<T> nesteInorden(Node<T> p) {
 
-      if(p.venstre != null){
-          System.out.println(p.venstre.verdi);
 
-          return p.venstre;
+  private static <T> Node<T> nesteInorden(Node<T> p){
+      Node<T> result = null;
+
+      Node q = p.høyre;
+
+      while(q != null){
+        result = q;
+        q = q.venstre;
       }
-      else if(p.høyre != null){
-          System.out.println(p.høyre.verdi);
 
-          return p.høyre;
+      if(result != null){
+        return result;
       }
-      else{
-          System.out.println(p.forelder.verdi);
 
-          return p.forelder;
+      q = p;
+
+      while(q != null){
+        if(q.forelder != null && q.forelder.venstre == q){
+          return q.forelder;
+        }
+        q = q.forelder;
       }
+      return null;
   }
+
   
   @Override
   public String toString() {
     String ut = "[";
     Node<T> p = rot;
-    Node<T> q;
+
+    while(p.venstre != null){
+      p = p.venstre;
+    }
+
     ut += p.verdi;
 
-    while(nesteInorden2(p) != null){
-        q = nesteInorden2(p);
-        ut += ", " + q.verdi;
-        p = q;
+    while(nesteInorden(p) != null){
+        p = nesteInorden(p);
+        ut += ", " + p.verdi;
     }
     ut += "]";
     return ut;
@@ -252,10 +263,11 @@ public class ObligSBinTre<T> implements Beholder<T>
   } // BladnodeIterator
 
   public static void main(String[] args){
-      Integer[] a = {4,7,2,9,4,10,8,7,4,6};
+      Integer[] a = {4,7,2,9,4,10,8,7,4,6,1};
       ObligSBinTre<Integer> tre = new ObligSBinTre<>(Comparator.naturalOrder());
       for(int verdi : a) tre.leggInn(verdi);
-      //System.out.println(tre.toString());
+
+      System.out.println(tre.toString());
   }
 
 
