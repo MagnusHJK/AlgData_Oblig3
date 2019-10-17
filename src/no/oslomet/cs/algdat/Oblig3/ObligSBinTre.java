@@ -150,6 +150,7 @@ public class ObligSBinTre<T> implements Beholder<T>
   }
   
   private static <T> Node<T> nesteInorden(Node<T> p) {
+
       if(p.venstre != null){
           System.out.println(p.venstre.verdi);
 
@@ -174,8 +175,8 @@ public class ObligSBinTre<T> implements Beholder<T>
     Node<T> q;
     ut += p.verdi;
 
-    while(nesteInorden(p) != null){
-        q = nesteInorden(p);
+    while(nesteInorden2(p) != null){
+        q = nesteInorden2(p);
         ut += ", " + q.verdi;
         p = q;
     }
@@ -254,7 +255,7 @@ public class ObligSBinTre<T> implements Beholder<T>
       Integer[] a = {4,7,2,9,4,10,8,7,4,6};
       ObligSBinTre<Integer> tre = new ObligSBinTre<>(Comparator.naturalOrder());
       for(int verdi : a) tre.leggInn(verdi);
-      System.out.println(tre.toString());
+      //System.out.println(tre.toString());
   }
 
 
