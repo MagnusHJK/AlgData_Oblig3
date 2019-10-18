@@ -209,7 +209,7 @@ public class ObligSBinTre<T> implements Beholder<T>
 
     while(true){
 
-      ut += ", " + p.verdi;
+      ut += p.verdi;
 
       if(p.venstre != null){
         for(p = p.venstre; p.høyre != null; p = p.høyre){
@@ -220,6 +220,8 @@ public class ObligSBinTre<T> implements Beholder<T>
         p = stack.pop();
       }
       else break;
+
+      ut += ", ";
     }
 
     ut += "]";
