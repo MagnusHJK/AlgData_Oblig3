@@ -243,15 +243,10 @@ public class ObligSBinTre<T> implements Beholder<T>
       ut += p + ", ";
       if(p.høyre == null) {
         p = p.venstre;
-      } else if (p.høyre != null){
-        p = p.høyre;
       } else {
-
+        p = p.høyre;
       }
-
     }
-
-
     ut += "]";
     return ut;
   }
