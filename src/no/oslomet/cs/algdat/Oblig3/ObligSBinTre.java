@@ -226,14 +226,44 @@ public class ObligSBinTre<T> implements Beholder<T>
     return ut;
   }
   
-  public String høyreGren()
-  {
-    throw new UnsupportedOperationException("Ikke kodet ennå!");
+  public String høyreGren(){
+    //throw new UnsupportedOperationException("Ikke kodet ennå!");
+    String ut = "[";
+    int nivå = 0;
+    int nesteNivå = 0;
+
+    Node p = rot;
+
+
+    if(p == null) {
+      return "[]";
+    }
+
+    while(p != null) {
+      ut += p + ", ";
+      if(p.høyre == null) {
+        p = p.venstre;
+      } else if (p.høyre != null){
+        p = p.høyre;
+      } else {
+
+      }
+
+    }
+
+
+    ut += "]";
+    return ut;
   }
   
-  public String lengstGren()
-  {
-    throw new UnsupportedOperationException("Ikke kodet ennå!");
+  public String lengstGren(){
+
+    String ut = "[";
+
+    ut += "]";
+    return ut;
+
+    //throw new UnsupportedOperationException("Ikke kodet ennå!");
   }
   
   public String[] grener()
