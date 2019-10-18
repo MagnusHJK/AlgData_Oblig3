@@ -181,6 +181,8 @@ public class ObligSBinTre<T> implements Beholder<T>
     String ut = "[";
     Node<T> p = rot;
 
+    //Finner den node lengst nede til venstre, slik at nesteInorden() starter
+    //fra rikgit node
     while(p.venstre != null){
       p = p.venstre;
     }
@@ -194,10 +196,34 @@ public class ObligSBinTre<T> implements Beholder<T>
     ut += "]";
     return ut;
   }
-  
-  public String omvendtString()
-  {
-    throw new UnsupportedOperationException("Ikke kodet ennå!");
+
+  //Traverserer iterativt gjennom treet i omvendt In-Order
+  public String omvendtString() {
+    String ut = "[";
+
+    Deque<Node> stack = new ArrayDeque<>();
+    Node p = rot;
+
+    //Finner siste In-Order Node
+    for(; p.høyre != null; p = p.høyre)stack.push(p);
+
+    while(true){
+
+      ut += ", " + p.verdi;
+
+      if(p.venstre != null){
+        for(p = p.venstre; p.høyre != null; p = p.høyre){
+          stack.push(p);
+        }
+      }
+      else if(!stack.isEmpty()){
+        p = stack.pop();
+      }
+      else break;
+    }
+
+    ut += "]";
+    return ut;
   }
   
   public String høyreGren()
@@ -267,7 +293,7 @@ public class ObligSBinTre<T> implements Beholder<T>
       ObligSBinTre<Integer> tre = new ObligSBinTre<>(Comparator.naturalOrder());
       for(int verdi : a) tre.leggInn(verdi);
 
-      System.out.println(tre.toString());
+      System.out.println(tre.omvendtString());
   }
 
 
