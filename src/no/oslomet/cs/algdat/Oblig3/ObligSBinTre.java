@@ -178,6 +178,8 @@ public class ObligSBinTre<T> implements Beholder<T>
   
   @Override
   public String toString() {
+    if(tom()) return "[]";
+
     String ut = "[";
     Node<T> p = rot;
 
@@ -199,6 +201,8 @@ public class ObligSBinTre<T> implements Beholder<T>
 
   //Traverserer iterativt gjennom treet i omvendt In-Order
   public String omvendtString() {
+    if(tom()) return "[]";
+
     String ut = "[";
 
     Deque<Node> stack = new ArrayDeque<>();
