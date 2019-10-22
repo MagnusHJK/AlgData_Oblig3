@@ -178,6 +178,8 @@ public class ObligSBinTre<T> implements Beholder<T>
   
   @Override
   public String toString() {
+    if(tom()) return "[]";
+
     String ut = "[";
     Node<T> p = rot;
 
@@ -199,6 +201,8 @@ public class ObligSBinTre<T> implements Beholder<T>
 
   //Traverserer iterativt gjennom treet i omvendt In-Order
   public String omvendtString() {
+    if(tom()) return "[]";
+
     String ut = "[";
 
     Deque<Node> stack = new ArrayDeque<>();
@@ -209,7 +213,7 @@ public class ObligSBinTre<T> implements Beholder<T>
 
     while(true){
 
-      ut += ", " + p.verdi;
+      ut += p.verdi;
 
       if(p.venstre != null){
         for(p = p.venstre; p.høyre != null; p = p.høyre){
@@ -220,6 +224,8 @@ public class ObligSBinTre<T> implements Beholder<T>
         p = stack.pop();
       }
       else break;
+
+      ut += ", ";
     }
 
     ut += "]";
@@ -255,10 +261,40 @@ public class ObligSBinTre<T> implements Beholder<T>
   public String lengstGren(){
     throw new UnsupportedOperationException("Ikke kodet ennå!");
   }
-  
-  public String[] grener()
-  {
-    throw new UnsupportedOperationException("Ikke kodet ennå!");
+  public String[] grener() {
+      String gren = "[";
+      String[] grener = new String[10];
+      int teller = 0;
+      int hoppeOppTeller = 2;
+
+      Node<T> p = rot;
+      gren += p.verdi;
+
+      while(true){
+
+          if(p.venstre == null && p.høyre == null){
+              gren += "]";
+              grener[teller] = gren;
+              teller++;
+
+              while(p.forelder.høyre == null){
+                  p = p.forelder;
+                  hoppeOppTeller++;
+              }
+              gren = gren.substring(0, gren.length() - hoppeOppTeller);
+              p = p.forelder.høyre;
+              gren += p.verdi;
+          }
+
+          if(p.venstre != null){
+              gren += p.venstre.verdi;
+              p = p.venstre;
+          }
+          if(p.høyre != null){
+              gren += p.høyre.verdi;
+              p = p.høyre;
+          }
+      }
   }
   
   public String bladnodeverdier()
@@ -309,11 +345,12 @@ public class ObligSBinTre<T> implements Beholder<T>
   } // BladnodeIterator
 
   public static void main(String[] args){
-      Integer[] a = {4,7,2,9,4,10,8,7,4,6,1};
-      ObligSBinTre<Integer> tre = new ObligSBinTre<>(Comparator.naturalOrder());
-      for(int verdi : a) tre.leggInn(verdi);
+        ObligSBinTre<Character> tre = new ObligSBinTre<>(Comparator.naturalOrder());
+        char[] verdier = "IATBHJCRSOFELKGDMPQN".toCharArray();
+        for(char c : verdier) tre.leggInn(c);
 
-      System.out.println(tre.omvendtString());
+        String[] s = tre.grener();
+        for(String gren : s) System.out.println(gren);
   }
 
 
