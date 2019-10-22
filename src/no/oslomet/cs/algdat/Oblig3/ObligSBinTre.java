@@ -89,16 +89,154 @@ public class ObligSBinTre<T> implements Beholder<T>
 
     return false;
   }
-  
+
+  //Oppgave 5
   @Override
   public boolean fjern(T verdi)
   {
-    throw new UnsupportedOperationException("Ikke kodet ennå!");
+    // Programkode 5.2.8
+    if (verdi == null) return false;  // treet har ingen nullverdier
+
+    Node<T> p = rot, q = null;   // q skal være forelder til p
+
+    while (p != null)            // leter etter verdi
+    {
+      int cmp = comp.compare(verdi,p.verdi);      // sammenligner
+      if (cmp < 0) { q = p; p = p.venstre; }      // går til venstre
+      else if (cmp > 0) { q = p; p = p.høyre; }   // går til høyre
+      else break;    // den søkte verdien ligger i p
+    }
+
+    if (p == null) return false;   // finner ikke verdi
+
+    if (p.venstre == null || p.høyre == null)  // Tilfelle 1) og 2)
+    {
+      Node<T> b = p.venstre != null ? p.venstre : p.høyre;  // b for barn
+      if (p == rot){
+        rot = b;
+        p = null;
+      } else if (p == q.venstre) {
+          if(b == null) {
+              q.venstre = p.venstre;
+              p = null;
+          } else {
+              q.venstre = p.venstre;
+              b.forelder = p.forelder;
+              p = null;
+          }
+      } else {
+        if(b == null) {
+            q.høyre = p.høyre;
+            p = null;
+        } else {
+            q.høyre = p.høyre;
+            b.forelder = p.forelder;
+            p = null;
+        }
+      }
+
+    } else  // Tilfelle 3)
+    {
+      Node<T> s = p, r = p.høyre;   // finner neste i inorden
+      while (r.venstre != null)
+      {
+        s = r;    // s er forelder til r
+        r = r.venstre;
+      }
+
+      p.verdi = r.verdi;   // kopierer verdien i r til p
+
+      if (s != p) {
+
+          r.høyre.forelder = r.forelder;
+        s.venstre = r.høyre;
+      } else {
+          if(r.høyre == null && r.venstre == null) {
+              s.høyre = null;
+              r = null;
+          } else {
+              r.høyre.forelder = r.forelder;
+              s.høyre = r.høyre;
+          }
+      }
+    }
+
+    antall--;   // det er nå én node mindre i treet
+    return true;
   }
-  
+
+
   public int fjernAlle(T verdi)
   {
-    throw new UnsupportedOperationException("Ikke kodet ennå!");
+      if(tom()) {
+          return 0;
+      }
+      Node<T> p = rot;
+      Node<T> q = null;
+      int fjernet = 0;
+
+      while (p != null)            // leter etter verdi
+      {
+          int cmp = comp.compare(verdi,p.verdi);      // sammenligner
+          if (cmp < 0) { q = p; p = p.venstre; }      // går til venstre
+          else if (cmp > 0) { q = p; p = p.høyre; }   // går til høyre
+          else break;    // den søkte verdien ligger i p
+      }
+
+      if(p == null) {
+          return 0;
+      }
+
+      while(inneholder(verdi)) {
+          if(p.venstre == null || p.høyre == null) {
+              Node<T> b = p.venstre != null ? p.venstre : p.høyre;
+
+              if (p == rot){
+                  rot = b;
+                  b.forelder = null;
+              } else if (p == q.venstre) {
+                  q.venstre = b;
+                  p.forelder = null;
+              } else {
+                  q.høyre = b;
+                  p.forelder = null;
+              }
+
+          } else  {
+              Node<T> s = p, r = p.høyre;   // finner neste i inorden
+              while (r.venstre != null)
+              {
+                  s = r;    // s er forelder til r
+                  r = r.venstre;
+              }
+
+              p.verdi = r.verdi;   // kopierer verdien i r til p
+
+
+              if(r.høyre == null && r.venstre == null) {
+                  if(s.høyre == r) {
+                      s.høyre = null;
+                      break;
+                  } else {
+                      s.venstre = null;
+                      break;
+                  }
+              }
+
+              if(s != p && (r.høyre == null || r.venstre == null)) {
+                  s.venstre = r.høyre;
+                  r.høyre.forelder = s;
+              }
+              else {
+                  s.høyre = r.høyre;
+                  r.høyre.forelder = s;
+              }
+          }
+          antall--;
+          fjernet++;
+      }
+
+      return fjernet;
   }
   
   @Override
@@ -144,9 +282,27 @@ public class ObligSBinTre<T> implements Beholder<T>
   }
   
   @Override
-  public void nullstill()
-  {
-    throw new UnsupportedOperationException("Ikke kodet ennå!");
+  public void nullstill() {
+      java.util.Deque<Node<T>> fifo_queue = new java.util.ArrayDeque<Node<T>>();
+
+      fifo_queue.addFirst(rot);
+      Node<T> current = new Node<T>(null,null,null,null);
+
+
+      while(fifo_queue.size() > 0) {
+
+          current = fifo_queue.removeLast();
+
+          if(current.venstre != null) {
+              fifo_queue.addFirst(current.venstre);
+
+          }
+          if(current.høyre != null) {
+              fifo_queue.addFirst(current.høyre);
+          }
+          current.verdi = null;
+          current.forelder = null;
+      }
   }
 
 
@@ -349,14 +505,24 @@ public class ObligSBinTre<T> implements Beholder<T>
 
   } // BladnodeIterator
 
-  public static void main(String[] args){
-        ObligSBinTre<Character> tre = new ObligSBinTre<>(Comparator.naturalOrder());
-        char[] verdier = "IATBHJCRSOFELKGDMPQN".toCharArray();
-        for(char c : verdier) tre.leggInn(c);
+  public static void main(String[] args) {
+      int[] a = {6, 3, 9, 1, 5, 7, 10, 2, 4, 8, 11, 6, 8};
+      ObligSBinTre<Integer> tre = new ObligSBinTre<>(Comparator.naturalOrder());
+      for (int verdi : a) tre.leggInn(verdi);
 
-        String[] s = tre.grener();
-        for(String gren : s) System.out.println(gren);
+      //System.out.println(tre.fjernAlle(4));
+      System.out.println(tre);
+      tre.fjern(6);
+      System.out.println(tre);
+    //  tre.fjernAlle(7);
+   //   tre.fjern(8);
+     // System.out.println("Antall : " + tre.antall);
+
+
+     // System.out.println(tre + " " + tre.omvendtString());
+
+     // tre.nullstill();
+
+
   }
-
-
 } // ObligSBinTre
