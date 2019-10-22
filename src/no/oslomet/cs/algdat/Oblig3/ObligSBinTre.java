@@ -266,40 +266,48 @@ public class ObligSBinTre<T> implements Beholder<T>
 
     //throw new UnsupportedOperationException("Ikke kodet ennå!");
   }
-  public String[] grener() {
-      String gren = "[";
-      String[] grener = new String[10];
-      int teller = 0;
-      int hoppeOppTeller = 2;
+  public String[] grener(){
+    if(tom()) return new String[0];
 
-      Node<T> p = rot;
-      gren += p.verdi;
+    ArrayList<String> liste = new ArrayList<>();
+    Stack<Node> stack = new Stack<>();
+    Node<T> p = rot;
+    Node<T> forrige = null;
 
-      while(true){
-
-          if(p.venstre == null && p.høyre == null){
-              gren += "]";
-              grener[teller] = gren;
-              teller++;
-
-              while(p.forelder.høyre == null){
-                  p = p.forelder;
-                  hoppeOppTeller++;
-              }
-              gren = gren.substring(0, gren.length() - hoppeOppTeller);
-              p = p.forelder.høyre;
-              gren += p.verdi;
-          }
-
-          if(p.venstre != null){
-              gren += p.venstre.verdi;
-              p = p.venstre;
-          }
-          if(p.høyre != null){
-              gren += p.høyre.verdi;
-              p = p.høyre;
-          }
+    do{
+      while(p != null){
+        stack.push(p);
+        p = p.venstre;
       }
+
+      while(p == null && !stack.isEmpty()){
+        p = stack.peek();
+
+        if(p.venstre == null && p.høyre == null){
+          Iterator<Node> ite = stack.iterator();
+          StringBuffer sb = new StringBuffer();
+
+          String prefix = "[";
+          while(ite.hasNext()){
+            sb.append(prefix);
+            prefix = ", ";
+            sb.append(ite.next().verdi);
+          }
+          String subfix = "]";
+          sb.append(subfix);
+          liste.add(sb.toString());
+        }
+
+        if(p.høyre == null || p.høyre == forrige){
+          stack.pop();
+          forrige = p;
+          p = null;
+        }else{
+          p = p.høyre;
+        }
+      }
+    } while(!stack.isEmpty());
+    return liste.toArray(new String[0]);
   }
   
   public String bladnodeverdier()
