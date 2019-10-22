@@ -458,12 +458,35 @@ public class ObligSBinTre<T> implements Beholder<T>
         }
       }
     } while(!stack.isEmpty());
+
     return liste.toArray(new String[0]);
   }
   
-  public String bladnodeverdier()
-  {
-    throw new UnsupportedOperationException("Ikke kodet ennå!");
+  public String bladnodeverdier() {
+    if(tom()) return"[]";
+
+    Node<T> p = rot;
+    String ut = "[";
+
+    while(p.venstre != null){
+      p = p.venstre;
+    }
+
+    if(p.venstre == null && p.høyre == null){
+      ut += p.verdi + ", ";
+    }
+
+    while(nesteInorden(p) != null){
+      p = nesteInorden(p);
+
+      //blad
+      if(p.venstre == null && p.høyre == null){
+        ut += p.verdi + ", ";
+      }
+
+    }
+      ut = ut.substring(0, ut.length() - 2);
+    return ut += "]";
   }
   
   public String postString()
