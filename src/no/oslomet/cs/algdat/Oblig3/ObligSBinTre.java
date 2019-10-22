@@ -489,9 +489,73 @@ public class ObligSBinTre<T> implements Beholder<T>
     return ut += "]";
   }
   
-  public String postString()
-  {
-    throw new UnsupportedOperationException("Ikke kodet ennå!");
+  public String postString() {
+    if(tom()) return "";
+
+    String ut = "[";
+    Deque<Node> stack = new ArrayDeque<>();
+    stack.push(rot);
+
+    while(!stack.isEmpty()){
+      Node<T> p = stack.pop();
+
+      if(p.høyre != null){
+        stack.push(p.høyre);
+      }
+      if(p.venstre != null){
+        stack.push(p.venstre);
+      }
+      ut += p.verdi;
+    }
+
+    return ut += "]";
+  }
+
+  public String postString2(){
+    if(tom()) return "";
+
+    String ut = "[";
+
+    Deque<Node> stack = new ArrayDeque<>();
+    Node<T> p = rot;
+
+    while(p.venstre != null || p.høyre != null){
+        if(p.venstre != null){
+            p = p.venstre;
+        }else if(p.høyre != null){
+            p = p.høyre;
+        }
+    }
+
+    stack.push(p);
+
+    Iterator<Node> iter = stack.iterator();
+
+    while(!stack.isEmpty()){
+      if(p.forelder == null){
+          stack.addLast(p);
+          break;
+      }
+      if(p == p.forelder.høyre){
+        stack.push(p.forelder);
+        p = p.forelder;
+      }
+
+      if(p == p.forelder.venstre){
+        if(p.forelder.høyre == null){
+          stack.push(p.forelder);
+          p = p.forelder;
+        }else{
+          p = p.forelder.høyre;
+        }
+      }
+    }
+
+    while(iter.hasNext()){
+      ut += iter.next().verdi;
+    }
+
+    return ut;
   }
   
   @Override
