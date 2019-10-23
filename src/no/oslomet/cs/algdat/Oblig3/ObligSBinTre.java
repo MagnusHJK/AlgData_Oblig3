@@ -494,70 +494,41 @@ public class ObligSBinTre<T> implements Beholder<T>
 
     String ut = "[";
     Deque<Node> stack = new ArrayDeque<>();
-    stack.push(rot);
-
-    while(!stack.isEmpty()){
-      Node<T> p = stack.pop();
-
-      if(p.høyre != null){
-        stack.push(p.høyre);
-      }
-      if(p.venstre != null){
-        stack.push(p.venstre);
-      }
-      ut += p.verdi;
-    }
-
-    return ut += "]";
-  }
-
-  public String postString2(){
-    if(tom()) return "";
-
-    String ut = "[";
-
-    Deque<Node> stack = new ArrayDeque<>();
     Node<T> p = rot;
 
     while(p.venstre != null || p.høyre != null){
         if(p.venstre != null){
             p = p.venstre;
-        }else if(p.høyre != null){
+        }else if (p.høyre != null){
             p = p.høyre;
         }
     }
 
-    stack.push(p);
+    ut += p.verdi + ", ";
 
-    Iterator<Node> iter = stack.iterator();
-
-    while(!stack.isEmpty()){
-      if(p.forelder == null){
-          stack.addLast(p);
-          break;
-      }
-      if(p == p.forelder.høyre){
-        stack.push(p.forelder);
-        p = p.forelder;
-      }
-
-      if(p == p.forelder.venstre){
-        if(p.forelder.høyre == null){
-          stack.push(p.forelder);
-          p = p.forelder;
-        }else{
-          p = p.forelder.høyre;
+    while(true){
+        if(p == rot){
+            break;
         }
-      }
-    }
+        if(p == p.forelder.høyre || p.forelder.høyre == null){
+            p = p.forelder;
+        }else {
+            p = p.forelder.høyre;
 
-    while(iter.hasNext()){
-      ut += iter.next().verdi;
+            while(true){
+                if(p.venstre != null) {
+                    p = p.venstre;
+                } else if(p.høyre != null) {
+                    p = p.høyre;
+                }else break;
+            }
+        }
+        ut += p.verdi + ", ";
     }
-
-    return ut;
+    ut = ut.substring(0, ut.length() -2);
+    return ut += "]";
   }
-  
+
   @Override
   public Iterator<T> iterator()
   {
