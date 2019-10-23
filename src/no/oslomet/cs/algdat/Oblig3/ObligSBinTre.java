@@ -372,7 +372,7 @@ public class ObligSBinTre<T> implements Beholder<T>
     Node<T> p = rot;
 
     //Finner den node lengst nede til venstre, slik at nesteInorden() starter
-    //fra rikgit node
+    //fra riktig node
     while(p.venstre != null){
       p = p.venstre;
     }
@@ -468,16 +468,16 @@ public class ObligSBinTre<T> implements Beholder<T>
 
         if(p.venstre == null && p.høyre == null){
           Iterator<Node> ite = stack.iterator();
-          StringBuffer sb = new StringBuffer();
+          StringBuilder sb = new StringBuilder();
 
-          String prefix = "[";
+          String sbFør = "[";
           while(ite.hasNext()){
-            sb.append(prefix);
-            prefix = ", ";
+            sb.append(sbFør);
+            sbFør = ", ";
             sb.append(ite.next().verdi);
           }
-          String subfix = "]";
-          sb.append(subfix);
+          String sbEtter = "]";
+          sb.append(sbEtter);
           liste.add(sb.toString());
         }
 
@@ -573,9 +573,17 @@ public class ObligSBinTre<T> implements Beholder<T>
     private boolean removeOK = false;
     private int iteratorendringer = endringer;
     
-    private BladnodeIterator()  // konstruktør
-    {
-
+    private BladnodeIterator(){
+        if(tom()){
+        }else{
+            while(p.venstre != null || p.høyre != null){
+                if(p.venstre != null){
+                    p = p.venstre;
+                }else if (p.høyre != null){
+                    p = p.høyre;
+                }
+            }
+        }
     }
     
     @Override
