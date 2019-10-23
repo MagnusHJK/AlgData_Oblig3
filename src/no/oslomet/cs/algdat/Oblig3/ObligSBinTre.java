@@ -47,6 +47,14 @@ public class ObligSBinTre<T> implements Beholder<T>
   @Override
   public boolean leggInn(T verdi)
   {
+
+      if(rot == null) {
+          rot = new Node<T>(null,null,null,null);
+      }
+
+
+
+
     Objects.requireNonNull(verdi, "Ulovlig med nullverdier!");
 
     Node<T> p = rot, q = null;               // p starter i roten
@@ -119,8 +127,12 @@ public class ObligSBinTre<T> implements Beholder<T>
           if(b == null) {
               q.venstre = p.venstre;
               p = null;
-          } else {
+          } else if(p.venstre != null){
               q.venstre = p.venstre;
+              b.forelder = p.forelder;
+              p = null;
+          } else if(p.høyre != null) {
+              q.venstre = p.høyre;
               b.forelder = p.forelder;
               p = null;
           }
@@ -128,8 +140,12 @@ public class ObligSBinTre<T> implements Beholder<T>
         if(b == null) {
             q.høyre = p.høyre;
             p = null;
-        } else {
+        } else if(p.høyre != null){
             q.høyre = p.høyre;
+            b.forelder = p.forelder;
+            p = null;
+        } else if(p.venstre != null) {
+            q.høyre = p.venstre;
             b.forelder = p.forelder;
             p = null;
         }
@@ -147,9 +163,13 @@ public class ObligSBinTre<T> implements Beholder<T>
       p.verdi = r.verdi;   // kopierer verdien i r til p
 
       if (s != p) {
-
-          r.høyre.forelder = r.forelder;
-        s.venstre = r.høyre;
+          if(r.høyre == null && r.venstre == null) {
+              s.venstre = null;
+              r = null;
+          } else {
+              r.høyre.forelder = r.forelder;
+              s.venstre = r.høyre;
+          }
       } else {
           if(r.høyre == null && r.venstre == null) {
               s.høyre = null;
@@ -169,6 +189,9 @@ public class ObligSBinTre<T> implements Beholder<T>
   public int fjernAlle(T verdi)
   {
       if(tom()) {
+          return 0;
+      }
+      if(!(inneholder(verdi))) {
           return 0;
       }
       Node<T> p = rot;
@@ -283,6 +306,11 @@ public class ObligSBinTre<T> implements Beholder<T>
   
   @Override
   public void nullstill() {
+
+      if(tom()) {
+          return;
+      }
+
       java.util.Deque<Node<T>> fifo_queue = new java.util.ArrayDeque<Node<T>>();
 
       fifo_queue.addFirst(rot);
@@ -300,8 +328,12 @@ public class ObligSBinTre<T> implements Beholder<T>
           if(current.høyre != null) {
               fifo_queue.addFirst(current.høyre);
           }
+          antall--;
+          endringer++;
+
           current.verdi = null;
           current.forelder = null;
+
       }
   }
 
@@ -543,7 +575,7 @@ public class ObligSBinTre<T> implements Beholder<T>
     
     private BladnodeIterator()  // konstruktør
     {
-      throw new UnsupportedOperationException("Ikke kodet ennå!");
+
     }
     
     @Override
@@ -555,13 +587,13 @@ public class ObligSBinTre<T> implements Beholder<T>
     @Override
     public T next()
     {
-      throw new UnsupportedOperationException("Ikke kodet ennå!");
+     removeOK = true;
     }
     
     @Override
     public void remove()
     {
-      throw new UnsupportedOperationException("Ikke kodet ennå!");
+     removeOK = false;
     }
 
   } // BladnodeIterator
@@ -582,8 +614,10 @@ public class ObligSBinTre<T> implements Beholder<T>
 
      // System.out.println(tre + " " + tre.omvendtString());
 
-     // tre.nullstill();
-
+      tre.nullstill();
+      System.out.println(tre);
+      String s = tre.toString();
+      System.out.println(s);
 
   }
 } // ObligSBinTre
