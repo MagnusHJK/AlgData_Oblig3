@@ -47,14 +47,6 @@ public class ObligSBinTre<T> implements Beholder<T>
   @Override
   public boolean leggInn(T verdi)
   {
-
-      if(rot == null) {
-          rot = new Node<T>(null,null,null,null);
-      }
-
-
-
-
     Objects.requireNonNull(verdi, "Ulovlig med nullverdier!");
 
     Node<T> p = rot, q = null;               // p starter i roten
@@ -593,9 +585,31 @@ public class ObligSBinTre<T> implements Beholder<T>
     }
     
     @Override
-    public T next()
-    {
+    public T next(){
+     if(tom()) throw new NoSuchElementException();
+
      removeOK = true;
+
+     Node<T> forrigeBlad = p;
+
+     while(nesteInorden(p) != null){
+
+         //blad
+         if(p.venstre == null && p.høyre == null){
+             Node<T> temp = p;
+             forrigeBlad = p;
+             p = nesteInorden(p);
+             return temp.verdi;
+         }else{
+             p = nesteInorden(p);
+         }
+     }
+
+     if(nesteInorden(p) == null){
+         throw new NoSuchElementException();
+     }else{
+         return forrigeBlad.verdi;
+     }
     }
     
     @Override
