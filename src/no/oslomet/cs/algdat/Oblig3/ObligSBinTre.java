@@ -393,7 +393,7 @@ public class ObligSBinTre<T> implements Beholder<T>
 
     String ut = "[";
 
-    Deque<Node> stack = new ArrayDeque<>();
+    Stack<Node> stack = new Stack<>();
     Node p = rot;
 
     //Finner siste In-Order Node
