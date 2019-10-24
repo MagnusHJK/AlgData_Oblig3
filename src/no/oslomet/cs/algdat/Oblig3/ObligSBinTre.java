@@ -567,6 +567,7 @@ public class ObligSBinTre<T> implements Beholder<T>
     
     private BladnodeIterator(){
         if(tom()){
+            p = p;
         }else{
             while(p.venstre != null || p.høyre != null){
                 if(p.venstre != null){
@@ -586,35 +587,31 @@ public class ObligSBinTre<T> implements Beholder<T>
     
     @Override
     public T next(){
-     if(tom()) throw new NoSuchElementException();
+     if(!hasNext()){
+         throw new NoSuchElementException();
+     }
 
      removeOK = true;
 
-     Node<T> forrigeBlad = p;
+     Node<T> funnetBlad = p;
+     Stack<Node> stack = new Stack<>();
 
      while(nesteInorden(p) != null){
-
          //blad
          if(p.venstre == null && p.høyre == null){
-             Node<T> temp = p;
-             forrigeBlad = p;
+             funnetBlad = p;
              p = nesteInorden(p);
-             return temp.verdi;
+             break;
          }else{
              p = nesteInorden(p);
          }
      }
 
-     if(nesteInorden(p) == null){
-         throw new NoSuchElementException();
-     }else{
-         return forrigeBlad.verdi;
-     }
+     return funnetBlad.verdi;
     }
     
     @Override
-    public void remove()
-    {
+    public void remove() {
      removeOK = false;
     }
 
