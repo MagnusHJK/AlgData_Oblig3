@@ -439,46 +439,71 @@ public class ObligSBinTre<T> implements Beholder<T>
   }
   
   public String lengstGren(){
-      String ut = "[";
-      String noderNåværendeGren = "";
-      String noderForrigeGren = "";
-      Node<T> forlattPosisjon;
+      String ut = "[";  //Ferdi ut med klammer []
+      String nåværendeGren = "";   //Den som holder på den nyeste grenen
+      int tellerNåværende = 0;
 
-      Node<T> p = rot;
+      String lengsteGren = ""; //Den grenen som er lengst, inneholder kun node verdier
+      int tellerLengste = 0;
 
+      Node<T> forlattPosisjon;  //Noden du "hoppet av" for å finne en gren
+      Node<T> p = rot;  //Den "vanlige" pekeren som går In-Order gjennom treet
+      Node<T> q = rot;  //Pekeren som KUN blir brukt når vi beveger oss fra blad node til rot node
+
+      if(tom()) return "[]";
+
+      //Finner første node for In-Order
       while(p.venstre != null){
           p = p.venstre;
       }
 
+      //Traverserer gjennom treet In-Order
       while(nesteInorden(p) != null){
 
-          p = nesteInorden(p);
-
+        //Hvis det finnes en blad node så starter vi å følge grenen opp, tar med verdiene og merker der vi forlot.
         if(p.venstre == null && p.høyre == null){
-            noderNåværendeGren += p.verdi;
-            forlattPosisjon = p;
+            q = p;
+            nåværendeGren += q.verdi;
+            tellerNåværende++;
 
-            while(p.forelder != null){
-                p = p.forelder;
-                noderNåværendeGren += p.verdi;
+            //Går oppover grenen til rot
+            while(q.forelder != null){
+                q = q.forelder;
+                nåværendeGren += q.verdi;
+                tellerNåværende++;
+
             }
 
-            if(noderNåværendeGren.length() > noderForrigeGren.length()){
-                noderForrigeGren = noderNåværendeGren;
-                noderNåværendeGren = "";
-                p = forlattPosisjon;
+            //Sjekker om denne grenen er lenger enn vår lengste, og returnerer til blad noden vi var på tidligere
+            if(tellerNåværende > tellerLengste){
+                lengsteGren = nåværendeGren;
+                tellerLengste = tellerNåværende;
+
+                nåværendeGren = "";
+                tellerNåværende = 0;
             }else{
-                noderNåværendeGren = "";
-                p = forlattPosisjon;
+                nåværendeGren = "";
+                tellerNåværende = 0;
             }
 
         }
+        p = nesteInorden(p);
       }
 
-      for(int i = noderForrigeGren.length() - 1; i >= 0;i--){
-            ut += noderForrigeGren.charAt(i) + ", ";
+      //Lager fin ut string, går i motsatt rekkefølge gjennom lengste gren
+      for(int i = lengsteGren.length() - 1; i >= 0;i--){
+            ut += lengsteGren.charAt(i) + ", ";
       }
-      ut = ut.substring(0, ut.length() - 2);
+
+      //Klipper av ekstra ", " på slutten hvis det er der
+      if(lengsteGren.length() > 1){
+          ut = ut.substring(0, ut.length() - 2);
+      }
+      //Hvis det kun er en node
+      else if(antall() == 1){
+          ut += p.verdi;
+      }
+
       ut += "]";
 
       return ut;
@@ -675,12 +700,6 @@ public class ObligSBinTre<T> implements Beholder<T>
      // System.out.println("Antall : " + tre.antall);
 
 
-     // System.out.println(tre + " " + tre.omvendtString());
-
-      tre.nullstill();
-      System.out.println(tre);
-      String s = tre.toString();
-      System.out.println(s);
 
   }
 } // ObligSBinTre
