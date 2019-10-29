@@ -471,7 +471,6 @@ public class ObligSBinTre<T> implements Beholder<T>
                 q = q.forelder;
                 nåværendeGren += q.verdi;
                 tellerNåværende++;
-
             }
 
             //Sjekker om denne grenen er lenger enn vår lengste, og returnerer til blad noden vi var på tidligere
@@ -485,7 +484,6 @@ public class ObligSBinTre<T> implements Beholder<T>
                 nåværendeGren = "";
                 tellerNåværende = 0;
             }
-
         }
         p = nesteInorden(p);
       }
@@ -504,10 +502,7 @@ public class ObligSBinTre<T> implements Beholder<T>
           ut += p.verdi;
       }
 
-      ut += "]";
-
-      return ut;
-
+      return ut += "[]";
   }
 
   public String[] grener(){
@@ -646,6 +641,7 @@ public class ObligSBinTre<T> implements Beholder<T>
                 }
             }
         }
+        iteratorendringer = endringer;
     }
     
     @Override
@@ -659,24 +655,22 @@ public class ObligSBinTre<T> implements Beholder<T>
      if(!hasNext()){
          throw new NoSuchElementException();
      }
-
      removeOK = true;
 
-     Node<T> funnetBlad = p;
-     Stack<Node> stack = new Stack<>();
+     T verdi = p.verdi;
 
      while(nesteInorden(p) != null){
          //blad
          if(p.venstre == null && p.høyre == null){
-             funnetBlad = p;
+             verdi = p.verdi;
              p = nesteInorden(p);
              break;
-         }else{
-             p = nesteInorden(p);
          }
+         p = nesteInorden(p);
      }
+     p = nesteInorden(p);
 
-     return funnetBlad.verdi;
+     return verdi;
     }
     
     @Override
