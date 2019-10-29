@@ -177,82 +177,18 @@ public class ObligSBinTre<T> implements Beholder<T>
     return true;
   }
 
+    public int fjernAlle(T verdi) {
+        if (tom()) {
+            return 0;
+        }
+        int fjernet = 0;
+        while(inneholder(verdi)) {
+            fjern(verdi);
+            fjernet++;
+        }
 
-  public int fjernAlle(T verdi)
-  {
-      if(tom()) {
-          return 0;
-      }
-      if(!(inneholder(verdi))) {
-          return 0;
-      }
-      Node<T> p = rot;
-      Node<T> q = null;
-      int fjernet = 0;
-
-      while (p != null)            // leter etter verdi
-      {
-          int cmp = comp.compare(verdi,p.verdi);      // sammenligner
-          if (cmp < 0) { q = p; p = p.venstre; }      // går til venstre
-          else if (cmp > 0) { q = p; p = p.høyre; }   // går til høyre
-          else break;    // den søkte verdien ligger i p
-      }
-
-      if(p == null) {
-          return 0;
-      }
-
-      while(inneholder(verdi)) {
-          if(p.venstre == null || p.høyre == null) {
-              Node<T> b = p.venstre != null ? p.venstre : p.høyre;
-
-              if (p == rot){
-                  rot = b;
-                  b.forelder = null;
-              } else if (p == q.venstre) {
-                  q.venstre = b;
-                  p.forelder = null;
-              } else {
-                  q.høyre = b;
-                  p.forelder = null;
-              }
-
-          } else  {
-              Node<T> s = p, r = p.høyre;   // finner neste i inorden
-              while (r.venstre != null)
-              {
-                  s = r;    // s er forelder til r
-                  r = r.venstre;
-              }
-
-              p.verdi = r.verdi;   // kopierer verdien i r til p
-
-
-              if(r.høyre == null && r.venstre == null) {
-                  if(s.høyre == r) {
-                      s.høyre = null;
-                      break;
-                  } else {
-                      s.venstre = null;
-                      break;
-                  }
-              }
-
-              if(s != p && (r.høyre == null || r.venstre == null)) {
-                  s.venstre = r.høyre;
-                  r.høyre.forelder = s;
-              }
-              else {
-                  s.høyre = r.høyre;
-                  r.høyre.forelder = s;
-              }
-          }
-          antall--;
-          fjernet++;
-      }
-
-      return fjernet;
-  }
+        return fjernet;
+    }
   
   @Override
   public int antall()
@@ -325,8 +261,13 @@ public class ObligSBinTre<T> implements Beholder<T>
 
           current.verdi = null;
           current.forelder = null;
+          current.venstre = null;
+          current.høyre = null;
+          current = null;
+
 
       }
+      this.rot = null;
   }
 
 
@@ -616,7 +557,7 @@ public class ObligSBinTre<T> implements Beholder<T>
     ut = ut.substring(0, ut.length() -2);
     return ut += "]";
   }
-
+  
   @Override
   public Iterator<T> iterator()
   {
@@ -672,7 +613,8 @@ public class ObligSBinTre<T> implements Beholder<T>
 
      return verdi;
     }
-    
+
+
     @Override
     public void remove() {
      removeOK = false;
@@ -694,6 +636,12 @@ public class ObligSBinTre<T> implements Beholder<T>
      // System.out.println("Antall : " + tre.antall);
 
 
+     // System.out.println(tre + " " + tre.omvendtString());
+
+      tre.nullstill();
+      System.out.println(tre);
+      String s = tre.toString();
+      System.out.println(s);
 
   }
 } // ObligSBinTre
