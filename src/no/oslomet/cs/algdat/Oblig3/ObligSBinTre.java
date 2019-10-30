@@ -641,7 +641,6 @@ public class ObligSBinTre<T> implements Beholder<T>
                 }
             }
         }
-        iteratorendringer = endringer;
     }
     
     @Override
@@ -657,12 +656,15 @@ public class ObligSBinTre<T> implements Beholder<T>
      }
      removeOK = true;
 
+
+
      T verdi = p.verdi;
 
      while(nesteInorden(p) != null){
          //blad
          if(p.venstre == null && p.høyre == null){
              verdi = p.verdi;
+             q = p;
              p = nesteInorden(p);
              break;
          }
@@ -675,24 +677,34 @@ public class ObligSBinTre<T> implements Beholder<T>
     
     @Override
     public void remove() {
+     if(!removeOK){
+         throw  new IllegalStateException();
+     }
      removeOK = false;
+
+     if(q.forelder.venstre == q){
+         q = q.forelder;
+         q.venstre = null;
+     }
+
+     if(q.forelder.høyre == q){
+        q = q.forelder;
+        q.høyre = null;
+     }
+
     }
 
   } // BladnodeIterator
 
   public static void main(String[] args) {
-      int[] a = {6, 3, 9, 1, 5, 7, 10, 2, 4, 8, 11, 6, 8};
-      ObligSBinTre<Integer> tre = new ObligSBinTre<>(Comparator.naturalOrder());
-      for (int verdi : a) tre.leggInn(verdi);
+    ObligSBinTre<Character> tre = new ObligSBinTre<>(Comparator.naturalOrder());
+    char[] verdier ="IATBHJCRSOFELKGDMPQN".toCharArray();
+    for(char c : verdier) tre.leggInn(c);
 
-      //System.out.println(tre.fjernAlle(4));
-      System.out.println(tre);
-      tre.fjern(6);
-      System.out.println(tre);
-    //  tre.fjernAlle(7);
-   //   tre.fjern(8);
-     // System.out.println("Antall : " + tre.antall);
-
+    while(!tre.tom()){
+        System.out.println(tre);
+        tre.fjernHvis(x -> true);
+    }
 
 
   }
