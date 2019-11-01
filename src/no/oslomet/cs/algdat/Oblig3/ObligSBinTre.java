@@ -69,6 +69,7 @@ public class ObligSBinTre<T> implements Beholder<T>
     else q.høyre = p;                        // høyre barn til q
 
     antall++;                                // én verdi mer i treet
+    endringer++;
     return true;                             // vellykket innlegging
   }
   
@@ -174,6 +175,7 @@ public class ObligSBinTre<T> implements Beholder<T>
     }
 
     antall--;   // det er nå én node mindre i treet
+    endringer++;
     return true;
   }
 
@@ -273,8 +275,10 @@ public class ObligSBinTre<T> implements Beholder<T>
 
   private static <T> Node<T> nesteInorden(Node<T> p){
       Node<T> result = null;
+      Node<T> q;
 
-      Node q = p.høyre;
+      q = p.høyre;
+
 
       while(q != null){
         result = q;
@@ -296,6 +300,23 @@ public class ObligSBinTre<T> implements Beholder<T>
       return null;
   }
 
+
+  private static <T> Node<T> nesteInorden2(Node<T> p){
+      if(p.høyre != null){
+          p = p.høyre;
+          while(p.venstre != null){
+              p = p.venstre;
+              return p;
+          }
+      }
+      else{
+          while(p.forelder != null && p.forelder.høyre == p){
+              p = p.forelder;
+          }
+          return p.forelder;
+      }
+      return p;
+  }
   
   @Override
   public String toString() {
@@ -303,6 +324,7 @@ public class ObligSBinTre<T> implements Beholder<T>
 
     String ut = "[";
     Node<T> p = rot;
+
 
     //Finner den node lengst nede til venstre, slik at nesteInorden() starter
     //fra riktig node
@@ -443,7 +465,7 @@ public class ObligSBinTre<T> implements Beholder<T>
           ut += p.verdi;
       }
 
-      return ut += "[]";
+      return ut += "]";
   }
 
   public String[] grener(){
@@ -519,7 +541,7 @@ public class ObligSBinTre<T> implements Beholder<T>
   }
   
   public String postString() {
-    if(tom()) return "";
+    if(tom()) return "[]";
 
     String ut = "[";
     Deque<Node> stack = new ArrayDeque<>();
@@ -566,11 +588,16 @@ public class ObligSBinTre<T> implements Beholder<T>
   
   private class BladnodeIterator implements Iterator<T>
   {
-    private Node<T> p = rot, q = null;
+    private Node<T> p = rot;
+    private Node<T> q = null;
     private boolean removeOK = false;
     private int iteratorendringer = endringer;
+    private Deque<Node> sletteStack = new ArrayDeque<>();   //Stack av noder som skal slettes
+    private Deque<Node> nodeStack = new ArrayDeque<>();
     
     private BladnodeIterator(){
+
+
         if(tom()){
             p = p;
         }else{
@@ -589,23 +616,30 @@ public class ObligSBinTre<T> implements Beholder<T>
     {
       return p != null;  // Denne skal ikke endres!
     }
-    
-    @Override
-    public T next(){
+
+
+    public T next2(){
      if(!hasNext()){
          throw new NoSuchElementException();
      }
      removeOK = true;
 
-
-
      T verdi = p.verdi;
+
+     if(p == rot.høyre && antall() <= 3){
+         rot.venstre = null;
+         rot.høyre = null;
+         p = rot;
+     }
+
 
      while(nesteInorden(p) != null){
          //blad
          if(p.venstre == null && p.høyre == null){
              verdi = p.verdi;
              q = p;
+             nodeStack.push(p);
+             sletteStack.push(q);
              p = nesteInorden(p);
              break;
          }
@@ -618,24 +652,81 @@ public class ObligSBinTre<T> implements Beholder<T>
 
 
     @Override
+    public T next(){
+        if(!hasNext()) throw new NoSuchElementException();
+        T verdi = p.verdi;
+        removeOK = true;
+
+
+        //Hvis stacken er tom, så fylles den opp
+        if(nodeStack.isEmpty()){
+            nodeStack.push(p);
+
+            while(nesteInorden(p) != null){
+                p = nesteInorden(p);
+                if(p.venstre == null && p.høyre == null){
+                    nodeStack.push(p);
+                }
+            }
+            p = nesteInorden(p);
+        }
+        while(!nodeStack.isEmpty()){
+            for(Node nodes : nodeStack){
+                if(nodes.høyre == null && nodes.venstre == null){
+                    p = nodeStack.removeLast();
+                    q = p;
+
+                    sletteStack.push(q);
+                    verdi = p.verdi;
+
+                    if(nodeStack.isEmpty()){
+                        p = null;
+                    }
+                    if(rot.høyre == null && rot.venstre == null){
+                        p = null;
+                        q = null;
+
+                    }
+                    return verdi;
+                }
+            }
+        }
+        return null;
+    }
+
+
+    @Override
     public void remove() {
      if(!removeOK){
          throw  new IllegalStateException();
      }
+
+     if(endringer != iteratorendringer){
+         throw new ConcurrentModificationException();
+     }
      removeOK = false;
 
-     if(q.forelder.venstre == q){
-         q = q.forelder;
-         q.venstre = null;
-     }
+     while(!sletteStack.isEmpty()) {
+         q = sletteStack.peek();
 
-     if(q.forelder.høyre == q){
-        q = q.forelder;
-        q.høyre = null;
-     }
+         if(rot.høyre == null && rot.venstre == null){
+             sletteStack.remove();
+             rot = null;
+         }
+         else if (q.forelder.høyre == q) {
+             sletteStack.remove();;
+             q.forelder.høyre = null;
 
+         } else if (q.forelder.venstre == q) {
+             sletteStack.remove();
+             q.forelder.venstre = null;
+
+         }
+         endringer++;
+         iteratorendringer = endringer;
+         antall--;
+     }
     }
-
   } // BladnodeIterator
 
   public static void main(String[] args) {
@@ -643,17 +734,15 @@ public class ObligSBinTre<T> implements Beholder<T>
     char[] verdier ="IATBHJCRSOFELKGDMPQN".toCharArray();
     for(char c : verdier) tre.leggInn(c);
 
+
+    for(Character c : tre) System.out.print(c + " ");
+
+      System.out.println("");
+
     while(!tre.tom()){
         System.out.println(tre);
         tre.fjernHvis(x -> true);
     }
-
-     // System.out.println(tre + " " + tre.omvendtString());
-
-      tre.nullstill();
-      System.out.println(tre);
-      String s = tre.toString();
-      System.out.println(s);
 
   }
 } // ObligSBinTre
