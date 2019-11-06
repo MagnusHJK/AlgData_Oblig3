@@ -300,23 +300,6 @@ public class ObligSBinTre<T> implements Beholder<T>
       return null;
   }
 
-
-  private static <T> Node<T> nesteInorden2(Node<T> p){
-      if(p.høyre != null){
-          p = p.høyre;
-          while(p.venstre != null){
-              p = p.venstre;
-              return p;
-          }
-      }
-      else{
-          while(p.forelder != null && p.forelder.høyre == p){
-              p = p.forelder;
-          }
-          return p.forelder;
-      }
-      return p;
-  }
   
   @Override
   public String toString() {
@@ -594,7 +577,7 @@ public class ObligSBinTre<T> implements Beholder<T>
     private int iteratorendringer = endringer;
     private Deque<Node> sletteStack = new ArrayDeque<>();   //Stack av noder som skal slettes
     private Deque<Node> nodeStack = new ArrayDeque<>();
-    
+
     private BladnodeIterator(){
 
 
@@ -610,7 +593,7 @@ public class ObligSBinTre<T> implements Beholder<T>
             }
         }
     }
-    
+
     @Override
     public boolean hasNext()
     {
@@ -618,131 +601,86 @@ public class ObligSBinTre<T> implements Beholder<T>
     }
 
 
-    public T next2(){
-     if(!hasNext()){
-         throw new NoSuchElementException();
-     }
-     removeOK = true;
+      @Override
+      public T next(){
+          if(!hasNext()) throw new NoSuchElementException();
+          if(tom()) throw new ConcurrentModificationException();
+          if(iteratorendringer != endringer) throw new ConcurrentModificationException();
 
-     T verdi = p.verdi;
-
-     if(p == rot.høyre && antall() <= 3){
-         rot.venstre = null;
-         rot.høyre = null;
-         p = rot;
-     }
+          T verdi = p.verdi;
+          removeOK = true;
 
 
-     while(nesteInorden(p) != null){
-         //blad
-         if(p.venstre == null && p.høyre == null){
-             verdi = p.verdi;
-             q = p;
-             nodeStack.push(p);
-             sletteStack.push(q);
-             p = nesteInorden(p);
-             break;
-         }
-         p = nesteInorden(p);
-     }
-     p = nesteInorden(p);
+          //Hvis stacken er tom, så fylles den opp
+          if(nodeStack.isEmpty()){
+              nodeStack.push(p);
 
-     return verdi;
-    }
+              while(nesteInorden(p) != null){
+                  p = nesteInorden(p);
+                  if(p.venstre == null && p.høyre == null){
+                      nodeStack.push(p);
+                  }
+              }
+              p = nesteInorden(p);
+          }
+          while(!nodeStack.isEmpty()){
+              for(Node nodes : nodeStack){
+                  if(nodes.høyre == null && nodes.venstre == null){
+                      p = nodeStack.removeLast();
+                      q = p;
 
+                      sletteStack.push(q);
+                      verdi = p.verdi;
 
-    @Override
-    public T next(){
-        if(!hasNext()) throw new NoSuchElementException();
-        T verdi = p.verdi;
-        removeOK = true;
+                      if(nodeStack.isEmpty()){
+                          p = null;
+                      }
+                      if(rot.høyre == null && rot.venstre == null){
+                          p = null;
+                          q = null;
 
-
-        //Hvis stacken er tom, så fylles den opp
-        if(nodeStack.isEmpty()){
-            nodeStack.push(p);
-
-            while(nesteInorden(p) != null){
-                p = nesteInorden(p);
-                if(p.venstre == null && p.høyre == null){
-                    nodeStack.push(p);
-                }
-            }
-            p = nesteInorden(p);
-        }
-        while(!nodeStack.isEmpty()){
-            for(Node nodes : nodeStack){
-                if(nodes.høyre == null && nodes.venstre == null){
-                    p = nodeStack.removeLast();
-                    q = p;
-
-                    sletteStack.push(q);
-                    verdi = p.verdi;
-
-                    if(nodeStack.isEmpty()){
-                        p = null;
-                    }
-                    if(rot.høyre == null && rot.venstre == null){
-                        p = null;
-                        q = null;
-
-                    }
-                    return verdi;
-                }
-            }
-        }
-        return null;
-    }
+                      }
+                      return verdi;
+                  }
+              }
+          }
+          return null;
+      }
 
 
-    @Override
-    public void remove() {
-     if(!removeOK){
-         throw  new IllegalStateException();
-     }
 
-     if(endringer != iteratorendringer){
-         throw new ConcurrentModificationException();
-     }
-     removeOK = false;
 
-     while(!sletteStack.isEmpty()) {
-         q = sletteStack.peek();
+      @Override
+      public void remove() {
+          if(!removeOK){
+              throw  new IllegalStateException();
+          }
 
-         if(rot.høyre == null && rot.venstre == null){
-             sletteStack.remove();
-             rot = null;
-         }
-         else if (q.forelder.høyre == q) {
-             sletteStack.remove();;
-             q.forelder.høyre = null;
+          if(endringer != iteratorendringer){
+              throw new ConcurrentModificationException();
+          }
+          removeOK = false;
 
-         } else if (q.forelder.venstre == q) {
-             sletteStack.remove();
-             q.forelder.venstre = null;
+          while(!sletteStack.isEmpty()) {
+              q = sletteStack.peek();
 
-         }
-         endringer++;
-         iteratorendringer = endringer;
-         antall--;
-     }
-    }
+              if(rot.høyre == null && rot.venstre == null){
+                  sletteStack.remove();
+                  rot = null;
+              }
+              else if (q.forelder.høyre == q) {
+                  sletteStack.remove();;
+                  q.forelder.høyre = null;
+
+              } else if (q.forelder.venstre == q) {
+                  sletteStack.remove();
+                  q.forelder.venstre = null;
+
+              }
+              endringer++;
+              iteratorendringer = endringer;
+              antall--;
+          }
+      }
   } // BladnodeIterator
-
-  public static void main(String[] args) {
-    ObligSBinTre<Character> tre = new ObligSBinTre<>(Comparator.naturalOrder());
-    char[] verdier ="IATBHJCRSOFELKGDMPQN".toCharArray();
-    for(char c : verdier) tre.leggInn(c);
-
-
-    for(Character c : tre) System.out.print(c + " ");
-
-      System.out.println("");
-
-    while(!tre.tom()){
-        System.out.println(tre);
-        tre.fjernHvis(x -> true);
-    }
-
-  }
 } // ObligSBinTre
