@@ -1,0 +1,7 @@
+Feilene kommer av at alle bladnoder blir lagt til i en stack på første kjør av next()
+og blir da ført videre til remove. Dette kunne bli løst ved å ta inn kun en og en
+node i stacken per kjør av next(), men fikke ikke dette til å fungere.
+Dette er også hvorfor antall blir feil i andre test.
+
+Oppgave 10h: Feil i metoden remove()![1, 3, 5, 7, 8, 10, 11]
+Oppgave 10i: Feil - må ha antall-- i remove()!
