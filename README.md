@@ -11,8 +11,8 @@ Sebastian Aaron Schwartz Johnsen - s333754, s333754@oslomet.no
 
 # Arbeidsfordeling
 I oppgaven har vi hatt følgende arbeidsfordeling:
-* Magnus har hatt hovedansvaret for oppgave 1,2,3,4
-* Jakob har hatt hovedansvaret for oppgave
-* Martin har hatt hovedansvaret for oppgave
-* Sebastian har hatt hovedansvaret for oppgave
+* Magnus har hatt hovedansvaret for oppgave 1,2,3,4,7,8
+* Jakob har hatt hovedansvaret for oppgave 6,
+* Martin har hatt hovedansvaret for oppgave 5, 10
+* Sebastian har hatt hovedansvaret for oppgave 1,2,3
 * Vi har vi fellesskap løst oppgave
